@@ -1,9 +1,12 @@
 //import { useEffect, useState } from "react";
-import { MongoClient } from 'mongodb';
+import { Fragment } from "react";
+import Head from "next/head";
+
+import { MongoClient } from "mongodb";
 
 import MeetupList from "../components/meetups/MeetupList";
 
-const DUMMY_MEETUPS = [
+/* const DUMMY_MEETUPS = [
   {
     id: "m1",
     title: "A First Meetup",
@@ -20,21 +23,32 @@ const DUMMY_MEETUPS = [
     address: "Some Address 105, 150 address city",
     description: "This is the second meeting!",
   },
-];
+]; */
+
+
 
 function HomePage(props) {
   /* 
   //resolved using the static page load
   //removed the data load
     const [loadedMeetups, setLoadedMeetups] = useState([]);
-
+  
     useEffect(() => {
         //Send API request
         //async task, call setLoadedMeetups, set the local data
         setLoadedMeetups(DUMMY_MEETUPS);
     }, []);
-*/
-  return <MeetupList meetups={props.meetups} />;
+  */
+
+  return (
+    <Fragment>
+      <Head>
+        <title>Ract Meetups</title>
+        <meta name="description" content="Brwose a huge list of highly active react meetups!" />
+      </Head>
+      <MeetupList meetups={props.meetups} />
+    </Fragment>
+  );
 }
 
 //This works in the pages folder
@@ -43,12 +57,13 @@ export async function getStaticProps() {
   //Function name should be same as it is built in for NEXTJS
   //Job is to prepare the static data for this page
 
-
-  const client = await MongoClient.connect('mongodb+srv://admin:admin@myatlascluster0.p0uai.mongodb.net/meetups?retryWrites=true&w=majority');
+  const client = await MongoClient.connect(
+    "mongodb+srv://admin:admin@myatlascluster0.p0uai.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
 
   const db = client.db();
 
-  const meetupsCollection = db.collection('meetup');
+  const meetupsCollection = db.collection("meetup");
 
   const meetups = await meetupsCollection.find().toArray();
 
@@ -56,14 +71,14 @@ export async function getStaticProps() {
   //Access file system, access api etc.,
   return {
     props: {
-      meetups: meetups.map(meetup => ({
-          title: meetup.title,
-          address: meetup.address,
-          image: meetup.image,
-          id: meetup._id.toString(),
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
       })),
     }, //Name is standard we need to use it as is
-    revalidate: 10 // Time is in seconds !! After this time the Next JS will re-generated again, just like new request
+    revalidate: 10, // Time is in seconds !! After this time the Next JS will re-generated again, just like new request
   };
 }
 
